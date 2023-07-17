@@ -56,6 +56,8 @@ function setup(): void {
     const key = core.getInput("key", {
         required: true,
     });
+
+    const publicKey = core.getInput("public_key");
     const name = core.getInput("name");
     const knownHosts = core.getInput("known_hosts", {
         required: true,
@@ -77,6 +79,7 @@ function setup(): void {
             },
         },
     ];
+
     if (shouldCreateKeyFile(path.join(sshDirName, name), ifKeyExists)) {
         files.push({
             name: name,
@@ -87,6 +90,18 @@ function setup(): void {
             },
         });
     }
+
+    if (publicKey !== "") {
+        files.push({
+            name: `${name}.pub`,
+            contents: insertLf(publicKey, false, true),
+            options: {
+                mode: 0o400,
+                flag: "wx",
+            },
+        });
+    }
+
     if (config !== "") {
         files.push({
             name: "config",
